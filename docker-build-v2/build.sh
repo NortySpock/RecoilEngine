@@ -13,6 +13,7 @@ fi
 USAGE="Usage: $0 [-h|--help] [--configure|--compile] [-j|--jobs {number_of_jobs}] {windows|linux} [cmake_flag...]"
 export CONFIGURE=true
 export COMPILE=true
+export TEST=true
 export CMAKE_BUILD_PARALLEL_LEVEL=
 
 ARCH=amd64
@@ -142,6 +143,7 @@ $RUNTIME run -it --rm \
     $UID_FLAGS \
     -e CONFIGURE \
     -e COMPILE \
+    -e TEST \
     -e CMAKE_BUILD_PARALLEL_LEVEL \
     "${EXTRA_ARGS[@]}" \
     $IMAGE \
@@ -175,5 +177,8 @@ if $COMPILE; then
   if [[ $ENGINE_PLATFORM =~ .*windows ]]; then
     ./split-debug-info.sh
   fi
+fi
+if $TEST; then 
+  ./test.sh
 fi
 ' -- "$@"
