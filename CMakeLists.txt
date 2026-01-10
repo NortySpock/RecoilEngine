@@ -361,6 +361,16 @@ if    (DEBUG_BOUNDSCHECK)
 endif (DEBUG_BOUNDSCHECK)
 
 
+### Strict Warnings (for catching common C++ issues)
+if    (ENABLE_STRICT_WARNINGS)
+	if    (NOT STRICT_WARNING_FLAGS)
+		message(WARNING "Tried to enable STRICT_WARNINGS, but no flags were set!")
+	else  (NOT STRICT_WARNING_FLAGS)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${STRICT_WARNING_FLAGS}")
+	endif (NOT STRICT_WARNING_FLAGS)
+endif (ENABLE_STRICT_WARNINGS)
+
+
 ### ld.gold
 option(COMPRESS_DEBUG_SYMBOLS "Compresses the DebugSymbols (needs ld.gold, beware: slow)" FALSE)
 if    (LDGOLD_FOUND)

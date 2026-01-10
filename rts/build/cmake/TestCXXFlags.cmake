@@ -143,3 +143,53 @@ if   (CMAKE_COMPILER_IS_GNUCXX)
 	set(MPX_FLAGS "")
 	check_and_add_flags(MPX_FLAGS -fcheck-pointer-bounds -mmpx -Wchkp)
 endif()
+
+
+# Strict warning flags for catching common C++ issues
+# Enable with -DENABLE_STRICT_WARNINGS=ON
+option(ENABLE_STRICT_WARNINGS "Enable additional compiler warnings" OFF)
+
+if (ENABLE_STRICT_WARNINGS AND NOT MSVC)
+	set(STRICT_WARNING_FLAGS "")
+
+	# Core warning bundle
+	check_and_add_flags(STRICT_WARNING_FLAGS -Wall -Wextra)
+
+	# Catch logic errors
+	check_and_add_flags(STRICT_WARNING_FLAGS
+		-Wshadow                 # Variable shadowing
+		-Wdouble-promotion       # Implicit float->double (sync issues!)
+		-Wconversion             # Implicit narrowing conversions
+		-Wsign-conversion        # Signed<->unsigned conversions
+	)
+
+	# Prevent undefined behavior
+	check_and_add_flags(STRICT_WARNING_FLAGS
+		-Wformat=2               # Format string issues
+		-Wstrict-aliasing=2      # Type punning violations
+		-Wcast-align             # Misaligned pointer casts
+		-Wshift-overflow=2       # Bit shift overflows
+	)
+
+	# Memory/pointer bugs
+	check_and_add_flags(STRICT_WARNING_FLAGS
+		-Wundef                  # #if on undefined macros
+		-Wuninitialized          # Uninitialized variable use
+		-Warray-bounds=2         # Out-of-bounds access
+	)
+
+	# Modern C++ best practices
+	check_and_add_flags(STRICT_WARNING_FLAGS
+		-Wnon-virtual-dtor       # Missing virtual destructor
+		-Woverloaded-virtual     # Accidentally hidden virtuals
+		-Wmisleading-indentation # Dangling else etc.
+	)
+
+	message(STATUS "Strict warnings enabled: ${STRICT_WARNING_FLAGS}")
+endif()
+
+if (ENABLE_STRICT_WARNINGS AND MSVC)
+	set(STRICT_WARNING_FLAGS "")
+	check_and_add_flags(STRICT_WARNING_FLAGS /W4)
+	message(STATUS "Strict warnings enabled (MSVC): ${STRICT_WARNING_FLAGS}")
+endif()
